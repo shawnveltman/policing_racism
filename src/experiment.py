@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 import matplotlib.pyplot as plt
 import fiona
@@ -24,6 +26,9 @@ class Department:
     def __init__(self, department_shapefile_path):
         self.shapefile = fiona.open(department_shapefile_path)
         self.crs_string = to_string(self.shapefile.crs)
+        if self.crs_string == None:
+            sys.exit("The Department Shapefile did not contain a .prj file "
+                     "with encoding information.  Please add that file to the directory.")
 
     def convert_department_shapefile_to_gps_coords(self):
         all_departments = {}
@@ -121,7 +126,7 @@ print(overlap_df[(overlap_df['overlap_area'] > 0)].head(100))
 # 4. Determine overlap % of Census Tracts with Precincts (separate table / dataframe?  Pivot table, at any rate)
 # 5. For each precinct, count total # of white, black, and other minority residents
 # 6. Create function to determine if coordinates need to be converted
-# 7. 
+# 7.
 
 import shapefile as shp
 
