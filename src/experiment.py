@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import fiona
 import pandas as pd
 from pyproj import Proj, transform
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, Point
 from fiona.crs import to_string
 
 class Census:
@@ -23,6 +23,8 @@ class Census:
         return census_boundaries
 
 class Department:
+    all_departments = None
+
     def __init__(self, department_shapefile_path):
         self.shapefile = fiona.open(department_shapefile_path)
         self.crs_string = to_string(self.shapefile.crs)
@@ -41,12 +43,18 @@ class Department:
                     newcoord = myproj(coord[0], coord[1], inverse=True)
                     department_polygon.append(newcoord)
                 all_departments[rec['id']] = department_polygon
+        self.all_departments = all_departments
         return all_departments
 
-    def convert_star_stle(self,star, stle):
-        myproj = Proj(self.crs_string, preserve_units=True)
-        newcoord = myproj(star, stle, inverse=True)
-        return newcoord
+    def precinct_containing_point(self, coordinate):
+        coordinate = Point(coordinate)
+        for id, precinct in self.all_departments.items():
+            if len(precinct) < 3:
+                continue
+            polygon = Polygon(precinct)
+            if polygon.contains(coordinate):
+                return id
+        return False
 
 class Incidents:
     def __init__(self, incidents_path):
@@ -74,8 +82,9 @@ class Incidents:
             self.df.drop(['INCIDENT_TIME'],axis=1,inplace=True)
 
         return combined_datetime
+
     def remove_no_gps(self):
-        return self.df.dropna(subset=['LOCATION_LATITUDE', 'LOCATION_LONGITUDE'])
+        return self.df.dropna(subset=['LOCATION_LATITUDE', 'LOCATION_LONGITUDE'], inplace=True)
 
 
 class Overlap:
@@ -105,18 +114,22 @@ incidents_path = "provided-data/Dept_37-00027/37-00027_UOF-P_2014-2016_prepped.c
 
 department = Department(department_shapefile_path)
 department_coords = department.convert_department_shapefile_to_gps_coords()
-print("Loaded departments")
-incidents = Incidents(incidents_path)
-df = incidents.get_dataframe()
-print("Loaded Incidents")
-census = Census(state_shapefile_path)
-census_coords = census.get_coords()
-print("Loaded Census")
-overlap = Overlap()
-overlap_percentage = overlap.percentage_of_county_in_precinct(census_coords,department_coords)
-print("Loaded overlap")
-overlap_df = pd.DataFrame(overlap_percentage)
-print(overlap_df[(overlap_df['overlap_area'] > 0)].head(100))
+
+print(department.precinct_containing_point((-97.738652,30.2669)))
+# print("Loaded departments")
+# incidents = Incidents(incidents_path)
+# incidents_df = incidents.get_dataframe()
+# print("Loaded Incidents")
+
+
+# census = Census(state_shapefile_path)
+# census_coords = census.get_coords()
+# print("Loaded Census")
+# overlap = Overlap()
+# overlap_percentage = overlap.percentage_of_county_in_precinct(census_coords,department_coords)
+# print("Loaded overlap")
+# overlap_df = pd.DataFrame(overlap_percentage)
+# print(overlap_df[(overlap_df['overlap_area'] > 0)].head(100))
 
 
 # TO DO:
