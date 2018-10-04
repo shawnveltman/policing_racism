@@ -26,7 +26,7 @@ class Department:
     def __init__(self, department_shapefile_path):
         self.shapefile = fiona.open(department_shapefile_path)
         self.crs_string = to_string(self.shapefile.crs)
-        if self.crs_string == None:
+        if self.crs_string == '':
             sys.exit("The Department Shapefile did not contain a .prj file "
                      "with encoding information.  Please add that file to the directory.")
 
