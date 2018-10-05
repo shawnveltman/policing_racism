@@ -1,17 +1,17 @@
 import sys
 
-import numpy as np
-import matplotlib.pyplot as plt
 import fiona
+import matplotlib.pyplot as plt
 import pandas as pd
-from pyproj import Proj, transform
-from shapely.geometry import Polygon, Point
 from fiona.crs import to_string
+from pyproj import Proj
+from shapely.geometry import Polygon, Point
+
 
 class Census:
     def __init__(self, census_path):
         self.census_path = census_path
-
+        self.polygons = self.get_coords()
 
     def get_coords(self):
         census_shapefile = fiona.open(self.census_path)
@@ -19,8 +19,16 @@ class Census:
         for row in census_shapefile:
             geoid = row['properties']['GEOID']
             coordinates = row['geometry']['coordinates'][0]
-            census_boundaries[geoid] = coordinates
+            if len(coordinates) > 2:
+                census_boundaries[geoid] = Polygon(coordinates)
         return census_boundaries
+
+    def census_area_containing_point(self, point):
+        for id, polygon in self.polygons.items():
+            if polygon.contains(point):
+                return id
+
+        return False
 
 class Department:
     all_departments = None
@@ -31,8 +39,9 @@ class Department:
         if self.crs_string == '':
             sys.exit("The Department Shapefile did not contain a .prj file "
                      "with encoding information.  Please add that file to the directory.")
+        self.polygons = self.convert_department_shapefile_to_gps_polygons()
 
-    def convert_department_shapefile_to_gps_coords(self):
+    def convert_department_shapefile_to_gps_polygons(self):
         all_departments = {}
         for rec in self.shapefile:
             coords = rec['geometry']['coordinates']
@@ -42,18 +51,16 @@ class Department:
                     myproj = Proj(self.crs_string, preserve_units=True)
                     newcoord = myproj(coord[0], coord[1], inverse=True)
                     department_polygon.append(newcoord)
-                all_departments[rec['id']] = department_polygon
-        self.all_departments = all_departments
+                length_of_department_polygon = len(department_polygon)
+                if(length_of_department_polygon > 2):
+                    all_departments[rec['id']] = Polygon(department_polygon)
         return all_departments
 
-    def precinct_containing_point(self, coordinate):
-        coordinate = Point(coordinate)
-        for id, precinct in self.all_departments.items():
-            if len(precinct) < 3:
-                continue
-            polygon = Polygon(precinct)
-            if polygon.contains(coordinate):
+    def precinct_containing_point(self, point):
+        for id, polygon in self.polygons.items():
+            if polygon.contains(point):
                 return id
+
         return False
 
 class Incidents:
@@ -72,14 +79,14 @@ class Incidents:
     def get_datetime_index(self):
         combined_datetime = self.get_combined_datetime()
         self.df['DATETIME'] = pd.to_datetime(combined_datetime)
-        self.df.drop(['INCIDENT_DATE'], axis=1,inplace=True)
+        self.df.drop(['INCIDENT_DATE'], axis=1, inplace=True)
 
     def get_combined_datetime(self):
         combined_datetime = self.df['INCIDENT_DATE']
         keys = self.df.keys()
         if 'INCIDENT_TIME' in keys:
-            combined_datetime = self.df['INCIDENT_DATE'].str.cat(df['INCIDENT_TIME'], sep=' ')
-            self.df.drop(['INCIDENT_TIME'],axis=1,inplace=True)
+            combined_datetime = self.df['INCIDENT_DATE'].str.cat(self.df['INCIDENT_TIME'], sep=' ')
+            self.df.drop(['INCIDENT_TIME'], axis=1, inplace=True)
 
         return combined_datetime
 
@@ -108,29 +115,30 @@ class Overlap:
 
         return final_array
 
+
 state_shapefile_path = "state-data/texas/cb_2017_48_tract_500k.shp"
 department_shapefile_path = "provided-data/Dept_37-00027/37-00027_Shapefiles/APD_DIST.shp"
 incidents_path = "provided-data/Dept_37-00027/37-00027_UOF-P_2014-2016_prepped.csv"
 
 department = Department(department_shapefile_path)
-department_coords = department.convert_department_shapefile_to_gps_coords()
 
-print(department.precinct_containing_point((-97.738652,30.2669)))
+census = Census(state_shapefile_path)
+census_containing_point = census.census_area_containing_point(Point(-97.738652, 30.2669))
+print(census_containing_point)
+# print(precinct_containing_point)
 # print("Loaded departments")
 # incidents = Incidents(incidents_path)
 # incidents_df = incidents.get_dataframe()
 # print("Loaded Incidents")
+#
 
-
-# census = Census(state_shapefile_path)
-# census_coords = census.get_coords()
+# census_coords = census.coords
 # print("Loaded Census")
 # overlap = Overlap()
-# overlap_percentage = overlap.percentage_of_county_in_precinct(census_coords,department_coords)
+# overlap_percentage = overlap.percentage_of_county_in_precinct(census_coords, department_coords)
 # print("Loaded overlap")
 # overlap_df = pd.DataFrame(overlap_percentage)
-# print(overlap_df[(overlap_df['overlap_area'] > 0)].head(100))
-
+# print(overlap_df[(overlap_df['overlap_area'] > 1)].head(100))
 
 # TO DO:
 # 1. From GPS coordinate of incident, determine which precinct it occured in
@@ -150,5 +158,5 @@ plt.figure()
 for shape in sf.shapeRecords():
     x = [i[0] for i in shape.shape.points[:]]
     y = [i[1] for i in shape.shape.points[:]]
-    plt.plot(x,y)
+    plt.plot(x, y)
 plt.show()
