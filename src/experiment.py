@@ -7,28 +7,10 @@ from fiona.crs import to_string
 from pyproj import Proj
 from shapely.geometry import Polygon, Point
 
+from src.census import Census
 
-class Census:
-    def __init__(self, census_path):
-        self.census_path = census_path
-        self.polygons = self.get_coords()
 
-    def get_coords(self):
-        census_shapefile = fiona.open(self.census_path)
-        census_boundaries = {}
-        for row in census_shapefile:
-            geoid = row['properties']['GEOID']
-            coordinates = row['geometry']['coordinates'][0]
-            if len(coordinates) > 2:
-                census_boundaries[geoid] = Polygon(coordinates)
-        return census_boundaries
 
-    def census_area_containing_point(self, point):
-        for id, polygon in self.polygons.items():
-            if polygon.contains(point):
-                return id
-
-        return False
 
 class Department:
     all_departments = None
@@ -63,39 +45,11 @@ class Department:
 
         return False
 
-class Incidents:
-    def __init__(self, incidents_path):
-        df = pd.read_csv(incidents_path)
-        self.df = df[1:]
 
-    def load_dataframe(self):
-        return self.df
-
-    def get_dataframe(self):
-        self.get_datetime_index()
-        self.remove_no_gps()
-        return self.df
-
-    def get_datetime_index(self):
-        combined_datetime = self.get_combined_datetime()
-        self.df['DATETIME'] = pd.to_datetime(combined_datetime)
-        self.df.drop(['INCIDENT_DATE'], axis=1, inplace=True)
-
-    def get_combined_datetime(self):
-        combined_datetime = self.df['INCIDENT_DATE']
-        keys = self.df.keys()
-        if 'INCIDENT_TIME' in keys:
-            combined_datetime = self.df['INCIDENT_DATE'].str.cat(self.df['INCIDENT_TIME'], sep=' ')
-            self.df.drop(['INCIDENT_TIME'], axis=1, inplace=True)
-
-        return combined_datetime
-
-    def remove_no_gps(self):
-        return self.df.dropna(subset=['LOCATION_LATITUDE', 'LOCATION_LONGITUDE'], inplace=True)
 
 
 class Overlap:
-    def percentage_of_county_in_precinct(self, census, departments):
+    def precint_and_county_overlaps(self, census, departments):
         final_array = []
         for county_id, county_polygon in census.polygons.items():
             for precinct_id, precinct_polygon in departments.polygons.items():
@@ -113,7 +67,7 @@ class Overlap:
 
                 final_array.append(row_array)
 
-        return final_array
+        return pd.DataFrame(final_array)
 
 state_shapefile_path = "state-data/texas/cb_2017_48_tract_500k.shp"
 department_shapefile_path = "provided-data/Dept_37-00027/37-00027_Shapefiles/APD_DIST.shp"
@@ -131,10 +85,9 @@ census = Census(state_shapefile_path)
 #
 
 overlap = Overlap()
-overlap_percentage = overlap.percentage_of_county_in_precinct(census, department)
-print("Loaded overlap")
-overlap_df = pd.DataFrame(overlap_percentage)
-print(overlap_df[(overlap_df['county_in_precinct'] > 1)])
+overlap_percentage = overlap.precint_and_county_overlaps(census, department)
+print(overlap_percentage)
+
 
 # TO DO:
 # 1. From GPS coordinate of incident, determine which precinct it occured in
