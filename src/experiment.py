@@ -95,26 +95,25 @@ class Incidents:
 
 
 class Overlap:
-    def percentage_of_county_in_precinct(self, county, precinct):
+    def percentage_of_county_in_precinct(self, census, departments):
         final_array = []
-        for county_id, county_coords in county.items():
-            if len(county_coords) < 3:
-                continue
-            for precinct_id, precinct_coords in precinct.items():
-                if len(precinct_coords) < 3:
-                    continue
+        for county_id, county_polygon in census.polygons.items():
+            for precinct_id, precinct_polygon in departments.polygons.items():
                 row_array = {}
-                precinct_polygon = Polygon(precinct_coords)
-                county_polygon = Polygon(county_coords)
-                overlap = county_polygon.intersection(precinct_polygon)
-                overlap_area = (overlap.area / county_polygon.area) * 100
                 row_array['county_id'] = county_id
                 row_array['precinct_id'] = precinct_id
-                row_array['overlap_area'] = overlap_area
+
+                county_overlap = county_polygon.intersection(precinct_polygon)
+                county_in_precinct = (county_overlap.area / county_polygon.area) * 100
+                row_array['county_in_precinct'] = county_in_precinct
+
+                precinct_overlap = precinct_polygon.intersection(county_polygon)
+                precinct_in_county = (precinct_overlap.area / precinct_polygon.area) * 100
+                row_array['precinct_in_county'] = precinct_in_county
+
                 final_array.append(row_array)
 
         return final_array
-
 
 state_shapefile_path = "state-data/texas/cb_2017_48_tract_500k.shp"
 department_shapefile_path = "provided-data/Dept_37-00027/37-00027_Shapefiles/APD_DIST.shp"
@@ -123,22 +122,19 @@ incidents_path = "provided-data/Dept_37-00027/37-00027_UOF-P_2014-2016_prepped.c
 department = Department(department_shapefile_path)
 
 census = Census(state_shapefile_path)
-census_containing_point = census.census_area_containing_point(Point(-97.738652, 30.2669))
-print(census_containing_point)
-# print(precinct_containing_point)
-# print("Loaded departments")
+# census_containing_point = census.census_area_containing_point(Point(-97.738652, 30.2669))
+# print(census_containing_point)
+
 # incidents = Incidents(incidents_path)
 # incidents_df = incidents.get_dataframe()
 # print("Loaded Incidents")
 #
 
-# census_coords = census.coords
-# print("Loaded Census")
-# overlap = Overlap()
-# overlap_percentage = overlap.percentage_of_county_in_precinct(census_coords, department_coords)
-# print("Loaded overlap")
-# overlap_df = pd.DataFrame(overlap_percentage)
-# print(overlap_df[(overlap_df['overlap_area'] > 1)].head(100))
+overlap = Overlap()
+overlap_percentage = overlap.percentage_of_county_in_precinct(census, department)
+print("Loaded overlap")
+overlap_df = pd.DataFrame(overlap_percentage)
+print(overlap_df[(overlap_df['county_in_precinct'] > 1)])
 
 # TO DO:
 # 1. From GPS coordinate of incident, determine which precinct it occured in
