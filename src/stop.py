@@ -1,27 +1,27 @@
 import datetime
+import sys
 
 import pandas as pd
 
+
 class Stop:
-    def __init__(self, stop_filepath=None,acs=None, chunk=None, chunksize=1000000):
+    def __init__(self, stop_filepath=None, acs=None, chunk=None, chunksize=1000000):
+        self.chunked_summary = None
         self.acs = acs
         self.filepath = stop_filepath
         self.chunk = chunk
         self.chunksize = chunksize
-        if self.chunk is None:
-            self.load_dataframe()
-            self.summary = self.create_summary()
-        else:
-            self.summary = self.create_chunked_summary()
-
+        self.load_dataframe()
+        self.summary = self.create_summary()
         self.add_acs_data_to_summary()
         self.add_differences()
 
-    def load_dataframe(self, chunk=False):
-        if chunk is False:
+    def load_dataframe(self,chunk=None):
+        if chunk is None:
             df = pd.read_csv(self.filepath)
         else:
             df = chunk
+
         df = df[df['county_fips'].notna()]
         df = df[df['driver_race'].notna()]
         df['driver_race'] = df['driver_race'].str.lower()
@@ -38,8 +38,9 @@ class Stop:
 
     def create_summary(self):
         summary = self.add_stop_percentage_to_summary_table()
+        stop_percentage_label = 'stop_percentage'
+        summary[stop_percentage_label] = summary['stops'] / summary['stops'].groupby(level=0).sum()
         pivot = self.create_single_columns_from_summary_table(summary)
-
         return pivot
 
     def create_single_columns_from_summary_table(self, summary):
@@ -51,13 +52,11 @@ class Stop:
         return pivot
 
     def add_stop_percentage_to_summary_table(self):
+
         summary = self.df.groupby(['county_fips', 'driver_race']).agg('count')
         summary = summary[['id']]
-        individual_label = 'stops'
-        summary[individual_label] = summary['id']
-        summary = summary[[individual_label]]
-        stop_percentage_label = 'stop_percentage'
-        summary[stop_percentage_label] = summary[individual_label] / summary[individual_label].groupby(level=0).sum()
+        summary['stops'] = summary['id']
+        summary = summary[['stops']]
         return summary
 
     def add_acs_data_to_summary(self):
@@ -86,13 +85,12 @@ class Stop:
         counter = 1
         for chunk in pd.read_csv(self.filepath, chunksize=self.chunksize):
             now = datetime.datetime.now()
-            print("Loading " + self.filepath + str(counter) + ' at ' + now.strftime("%H:%M:%S"))
             self.load_dataframe(chunk=chunk)
-            self.summary = self.create_summary()
-            total_summary = pd.concat([total_summary, self.summary])
+            summary = self.add_stop_percentage_to_summary_table()
+            total_summary = pd.concat([total_summary, summary])
             counter = counter + 1
 
-        print(total_summary)
-        return True
-
-
+        group = total_summary.reset_index()
+        group.drop('stop_percentage', inplace=True, axis=1)
+        group = group.groupby(['county_fips', 'driver_race']).agg('sum')
+        return group
