@@ -20,13 +20,14 @@ class AcsData:
             col_name = race + '_percentage'
             if race in column_names:
                 summary[col_name] = summary[race] / summary['total_population']
-
+            else:
+                summary[col_name] = 0
         return summary
 
     def rename_columns(self):
         fips = self.df['GEO.id2'].astype('str').str[:5]
 
-        hispanic_values = ['HD01_VD12','HD01_VD13','HD01_VD14','HD01_VD15','HD01_VD16','HD01_VD17','HD01_VD18',
+        hispanic_values = ['HD01_VD13','HD01_VD14','HD01_VD15','HD01_VD16','HD01_VD17','HD01_VD18',
                            'HD01_VD19','HD01_VD20','HD01_VD21']
 
         race_cols = ['HD01_VD01','HD01_VD03','HD01_VD04','HD01_VD06']

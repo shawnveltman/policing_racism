@@ -1,7 +1,8 @@
 import pandas as pd
 
 class Stop:
-    def __init__(self, stop_filepath,acs=None):
+    def __init__(self, stop_filepath=None,acs=None, chunk=None):
+        self.chunk = chunk
         self.acs = acs
         self.df = self.load_dataframe(stop_filepath)
         self.summary = self.create_summary()
@@ -9,7 +10,11 @@ class Stop:
         self.add_differences()
 
     def load_dataframe(self, filepath):
-        df = pd.read_csv(filepath)
+        if self.chunk is None:
+            df = pd.read_csv(filepath)
+        else:
+            df = self.chunk
+
         df = df[df['county_fips'].notna()]
         df = df[df['driver_race'].notna()]
         df['driver_race'] = df['driver_race'].str.lower()
