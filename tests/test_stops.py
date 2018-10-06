@@ -19,6 +19,7 @@ def test_creates_unique_officer_id_from_state_and_officer_id():
     stops_by_officer_wy40 = stops[stops['state_officer_id'] == 'wy40']
 
     assert len(stops_by_officer_wy40) > 0
+    assert "officer_id" not in stops
 
 
 def test_when_no_acs_given_summary_is_just_pivot():
@@ -27,12 +28,14 @@ def test_when_no_acs_given_summary_is_just_pivot():
 
     assert "white_percentage" not in columns
 
+
 def test_when_acs_given_summary_contains_acs():
     acs = AcsData('data/acs_test.csv')
-    stops = Stop('data/stops_test.csv',acs=acs)
+    stops = Stop('data/stops_test.csv', acs=acs)
 
     assert stops.summary.loc['56001']['white_percentage'] > 0.83269
     assert stops.summary.loc['56001']['white_percentage'] < 0.83271
+
 
 def test_proportion_difference_columns_added_on_creation():
     acs = AcsData('data/acs_test.csv')
@@ -42,3 +45,8 @@ def test_proportion_difference_columns_added_on_creation():
     assert summary.loc['56001']['white_difference'] > 0.07730
     assert summary.loc['56001']['white_difference'] < 0.07740
 
+
+def test_files_with_no_officer_id_loads():
+    stops = Stop("data/stops_test_no_officer_id.csv")
+
+    assert len(stops.df) > 5

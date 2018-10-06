@@ -14,9 +14,12 @@ class Stop:
         df = df[df['driver_race'].notna()]
         df['driver_race'] = df['driver_race'].str.lower()
         df['county_fips'] = df['county_fips'].astype(int).astype(str)
-        df['state_officer_id'] = df['state'].str.lower() + df['officer_id'].astype(int).astype(str)
+        cols_to_drop = ['location_raw', 'county_name', 'driver_race_raw']
 
-        cols_to_drop = ['location_raw', 'county_name', 'driver_race_raw','officer_id']
+        if 'officer_id' in df.columns:
+            df['state_officer_id'] = df['state'].str.lower() + df['officer_id'].astype(int).astype(str)
+            cols_to_drop.append('officer_id')
+
         df = df.drop(cols_to_drop, axis=1)
 
         return df

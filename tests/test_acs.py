@@ -10,7 +10,6 @@ def test_summary_works():
     acs_filepath = "data/acs_test.csv"
     acs = AcsData(acs_filepath)
     summary = acs.create_summary()
-    print(summary.head())
     hispanic_percentage = summary.loc['56001']['hispanic_percentage']
     assert hispanic_percentage > 0.18947
     assert hispanic_percentage < 0.18948

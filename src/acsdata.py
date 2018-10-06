@@ -3,7 +3,7 @@ import pandas as pd
 class AcsData:
     def __init__(self,filepath=None):
         self.set_filepath(filepath)
-        self.races = ['white', 'black', 'hispanic', 'asian','hispanic']
+        self.races = ['white', 'black', 'hispanic', 'asian','other']
         self.df = self.load_data()
         self.rename_columns()
         self.summary = self.create_summary()
