@@ -32,3 +32,8 @@ class CommunitySurvey:
     def population_black(self):
         return self.column_values_for('HC01_VC50')
 
+    def add_population_percentage(self,row):
+        self.set_census_tract[row['county_id']]
+        row['pop_white'] = self.population_white
+        row['pop_black'] = self.population_black
+        return row
