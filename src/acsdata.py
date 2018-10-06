@@ -3,6 +3,7 @@ import pandas as pd
 class AcsData:
     def __init__(self,filepath=None):
         self.set_filepath(filepath)
+        self.races = ['white', 'black', 'hispanic', 'asian','hispanic']
         self.df = self.load_data()
         self.rename_columns()
         self.summary = self.create_summary()
@@ -13,10 +14,8 @@ class AcsData:
             self.filepath = "data/acs.csv"
 
     def create_summary(self):
-        races = ['white', 'black', 'other', 'asian','hispanic']
-
         summary = self.df.groupby('county_fips').sum()
-        for race in races:
+        for race in self.races:
             col_name = race + '_percentage'
             summary[col_name] = summary[race] / summary['total_population']
 

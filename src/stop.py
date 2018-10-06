@@ -1,10 +1,12 @@
 import pandas as pd
 
 class Stop:
-    def __init__(self, stop_filepath,acs_filepath=None):
-        self.acs_filepath = acs_filepath
+    def __init__(self, stop_filepath,acs=None):
+        self.acs = acs
         self.df = self.load_dataframe(stop_filepath)
         self.summary = self.create_summary()
+        self.add_acs_data_to_summary()
+        self.add_differences()
 
     def load_dataframe(self, filepath):
         df = pd.read_csv(filepath)
@@ -42,3 +44,22 @@ class Stop:
         stop_percentage_label = 'stop_percentage'
         summary[stop_percentage_label] = summary[individual_label] / summary[individual_label].groupby(level=0).sum()
         return summary
+
+    def add_acs_data_to_summary(self):
+        if not self.acs:
+            return
+
+        merge = pd.merge(self.summary, self.acs.summary, on='county_fips')
+        self.summary = merge
+
+    def add_differences(self):
+        if not self.acs:
+            return
+
+        for race in self.acs.races:
+            col_name = race + "_difference"
+            stop_percentage_name = race + "_stop_percentage"
+            pop_percentage_name = race + "_percentage"
+            self.summary[col_name] = self.summary[stop_percentage_name] - self.summary[pop_percentage_name]
+
+        return True
