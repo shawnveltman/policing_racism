@@ -1,3 +1,5 @@
+import pandas as pd
+
 from src.acsdata import AcsData
 from src.stop import Stop
 
@@ -50,3 +52,12 @@ def test_files_with_no_officer_id_loads():
     stops = Stop(stop_filepath="data/stops_test_no_officer_id.csv")
 
     assert len(stops.df) > 5
+
+
+# def test_summary_works_when_chunking():
+#     acs = AcsData('data/acs_test.csv')
+#     stops = Stop(stop_filepath="data/stops_test_no_officer_id.csv",chunk=True,acs=acs,chunksize=2)
+#
+#     summary = stops.summary
+#     assert summary.loc['56001']['white_difference'] > 0.07730
+#     assert summary.loc['56001']['white_difference'] < 0.07740

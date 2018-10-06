@@ -1,20 +1,27 @@
+import datetime
+
 import pandas as pd
 
 class Stop:
-    def __init__(self, stop_filepath=None,acs=None, chunk=None):
-        self.chunk = chunk
+    def __init__(self, stop_filepath=None,acs=None, chunk=None, chunksize=1000000):
         self.acs = acs
-        self.df = self.load_dataframe(stop_filepath)
-        self.summary = self.create_summary()
+        self.filepath = stop_filepath
+        self.chunk = chunk
+        self.chunksize = chunksize
+        if self.chunk is None:
+            self.load_dataframe()
+            self.summary = self.create_summary()
+        else:
+            self.summary = self.create_chunked_summary()
+
         self.add_acs_data_to_summary()
         self.add_differences()
 
-    def load_dataframe(self, filepath):
-        if self.chunk is None:
-            df = pd.read_csv(filepath)
+    def load_dataframe(self, chunk=False):
+        if chunk is False:
+            df = pd.read_csv(self.filepath)
         else:
-            df = self.chunk
-
+            df = chunk
         df = df[df['county_fips'].notna()]
         df = df[df['driver_race'].notna()]
         df['driver_race'] = df['driver_race'].str.lower()
@@ -27,7 +34,7 @@ class Stop:
 
         df = df.drop(cols_to_drop, axis=1)
 
-        return df
+        self.df = df
 
     def create_summary(self):
         summary = self.add_stop_percentage_to_summary_table()
@@ -73,3 +80,19 @@ class Stop:
                 self.summary[col_name] = self.summary[stop_percentage_name] - self.summary[pop_percentage_name]
 
         return True
+
+    def create_chunked_summary(self):
+        total_summary = pd.DataFrame()
+        counter = 1
+        for chunk in pd.read_csv(self.filepath, chunksize=self.chunksize):
+            now = datetime.datetime.now()
+            print("Loading " + self.filepath + str(counter) + ' at ' + now.strftime("%H:%M:%S"))
+            self.load_dataframe(chunk=chunk)
+            self.summary = self.create_summary()
+            total_summary = pd.concat([total_summary, self.summary])
+            counter = counter + 1
+
+        print(total_summary)
+        return True
+
+
