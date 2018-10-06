@@ -5,9 +5,10 @@ class AcsData:
         self.filepath = filepath
         self.df = self.load_data()
         self.rename_columns()
+        self.summary = self.create_summary()
 
     def create_summary(self):
-        races = ['white', 'black', 'native', 'pacific_islander', 'other', 'asian','hispanic']
+        races = ['white', 'black', 'other', 'asian','hispanic']
 
         summary = self.df.groupby('fips').sum()
         for race in races:
@@ -34,6 +35,7 @@ class AcsData:
         df['other'] = df[native_cols].sum(axis=1)
 
         df.drop(hispanic_values,axis=1,inplace=True)
+        df.drop(native_cols, axis=1, inplace=True)
         col_names = {
             'HD01_VD01': 'total_population',
             'HD01_VD03': 'white',

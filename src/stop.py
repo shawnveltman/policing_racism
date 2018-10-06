@@ -8,7 +8,7 @@ class Stop:
     def load_dataframe(self, filepath):
         df = pd.read_csv(filepath)
         cols_to_drop = ['location_raw', 'county_name','driver_race_raw']
-        df = df.drop(cols_to_drop)
+        df = df.drop(cols_to_drop,axis=1)
         df['driver_race'] = df['driver_race'].str.lower()
         df['county_fips'] = df['county_fips'].astype(str)
         df = df[df['county_fips'].notna()]
