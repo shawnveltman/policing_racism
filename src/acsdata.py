@@ -15,9 +15,11 @@ class AcsData:
 
     def create_summary(self):
         summary = self.df.groupby('county_fips').sum()
+        column_names = summary.columns
         for race in self.races:
             col_name = race + '_percentage'
-            summary[col_name] = summary[race] / summary['total_population']
+            if race in column_names:
+                summary[col_name] = summary[race] / summary['total_population']
 
         return summary
 

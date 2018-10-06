@@ -59,10 +59,12 @@ class Stop:
         if not self.acs:
             return
 
+        columns = self.summary.columns
         for race in self.acs.races:
             col_name = race + "_difference"
             stop_percentage_name = race + "_stop_percentage"
             pop_percentage_name = race + "_percentage"
-            self.summary[col_name] = self.summary[stop_percentage_name] - self.summary[pop_percentage_name]
+            if (pop_percentage_name in columns) and (stop_percentage_name in columns):
+                self.summary[col_name] = self.summary[stop_percentage_name] - self.summary[pop_percentage_name]
 
         return True
