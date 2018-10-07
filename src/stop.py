@@ -6,6 +6,7 @@ import pandas as pd
 
 class Stop:
     def __init__(self, stop_filepath=None, acs=None, chunk=None, chunksize=1000000):
+        self.df = None
         self.chunked_summary = None
         self.acs = acs
         self.filepath = stop_filepath
@@ -36,6 +37,7 @@ class Stop:
         df = df.drop(cols_to_drop, axis=1)
 
         self.df = df
+        return True
 
     def create_summary(self):
         if self.chunk is None:
@@ -43,8 +45,8 @@ class Stop:
         else:
             self.summary = self.create_chunked_summary()
 
-        self.summary = self.create_summary()
-        
+        self.summary = self.create_summary_internals()
+
         return True
 
     def create_summary_internals(self):
@@ -52,14 +54,18 @@ class Stop:
             summary = self.add_stop_percentage_to_summary_table()
         else:
             summary = self.summary
+
         stop_percentage_label = 'stop_percentage'
         summary[stop_percentage_label] = summary['stops'] / summary['stops'].groupby(level=0).sum()
         pivot = self.create_single_columns_from_summary_table(summary)
 
-        self.add_acs_data_to_summary()
-        self.add_differences()
-        export_filename = self.filepath.split('/')[-1]
-        self.summary.to_csv('data/summaries/' + export_filename)
+        pivot = self.add_acs_data_to_summary(pivot)
+        pivot = self.add_differences(pivot)
+        # export_filename = self.filepath.split('/')[-1]
+        # self.summary.to_csv('data/summaries/' + export_filename)
+        if pivot is None:
+            return summary
+
         return pivot
 
     def create_single_columns_from_summary_table(self, summary):
@@ -77,26 +83,26 @@ class Stop:
         summary = summary[['stops']]
         return summary
 
-    def add_acs_data_to_summary(self):
+    def add_acs_data_to_summary(self,summary):
+        if not self.acs:
+            return summary
+
+        merge = pd.merge(summary, self.acs.summary, on='county_fips')
+        return merge
+
+    def add_differences(self,pivot):
         if not self.acs:
             return
 
-        merge = pd.merge(self.summary, self.acs.summary, on='county_fips')
-        self.summary = merge
-
-    def add_differences(self):
-        if not self.acs:
-            return
-
-        columns = self.summary.columns
+        columns = pivot.columns
         for race in self.acs.races:
             col_name = race + "_difference"
             stop_percentage_name = race + "_stop_percentage"
             pop_percentage_name = race + "_percentage"
             if (pop_percentage_name in columns) and (stop_percentage_name in columns):
-                self.summary[col_name] = self.summary[stop_percentage_name] - self.summary[pop_percentage_name]
+                pivot[col_name] = pivot[stop_percentage_name] - pivot[pop_percentage_name]
 
-        return True
+        return pivot
 
     def create_chunked_summary(self):
         total_summary = pd.DataFrame()
