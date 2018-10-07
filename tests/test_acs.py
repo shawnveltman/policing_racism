@@ -1,6 +1,3 @@
-from src.acsdata import AcsData
-
-
 def test_columns_renamed_and_hispanic_values_aggregated_on_import(acs):
     assert acs.df['hispanic'].sum() > 0
 

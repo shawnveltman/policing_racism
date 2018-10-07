@@ -2,7 +2,7 @@ import pandas as pd
 
 
 class AcsData:
-    def __init__(self, filepath=None):
+    def __init__(self, filepath='data/acs.csv'):
         self.set_filepath(filepath)
         self.races = ['white', 'black', 'hispanic', 'asian', 'other']
         self.df = self.load_data()

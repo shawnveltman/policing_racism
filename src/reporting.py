@@ -3,7 +3,6 @@ import os
 
 import pandas as pd
 
-from src.acsdata import AcsData
 from src.stop import Stop
 
 
@@ -30,6 +29,7 @@ class ReportManager:
             filename = file.split('/')[-1]
             file_path = output_directory + "/" + filename
             if os.path.exists(file_path):
+                print("Skipping " + file)
                 self.skipped_files.append(file_path)
             else:
                 stops = Stop(file,acs=acs,chunk=True)
