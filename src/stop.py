@@ -1,5 +1,4 @@
 import datetime
-import sys
 
 import pandas as pd
 
@@ -14,7 +13,6 @@ class Stop:
         self.chunksize = chunksize
         self.summary = None
 
-
     def load_dataframe(self):
         if self.chunk is None:
             df = pd.read_csv(self.filepath)
@@ -23,7 +21,7 @@ class Stop:
 
         df = df[df['county_fips'].notna()]
         df = df[df['driver_race'].notna()]
-        if(len(df) > 0):
+        if (len(df) > 0):
             df['driver_race'] = df['driver_race'].str.lower()
             df['county_fips'] = df['county_fips'].astype(int).astype(str)
 
@@ -47,6 +45,9 @@ class Stop:
 
         self.summary = self.create_summary_internals()
 
+        export_filename = self.filepath.split('/')[-1]
+        self.summary.to_csv('data/summaries/' + export_filename)
+
         return True
 
     def create_summary_internals(self):
@@ -61,8 +62,6 @@ class Stop:
 
         pivot = self.add_acs_data_to_summary(pivot)
         pivot = self.add_differences(pivot)
-        # export_filename = self.filepath.split('/')[-1]
-        # self.summary.to_csv('data/summaries/' + export_filename)
         if pivot is None:
             return summary
 
@@ -83,14 +82,14 @@ class Stop:
         summary = summary[['stops']]
         return summary
 
-    def add_acs_data_to_summary(self,summary):
+    def add_acs_data_to_summary(self, summary):
         if not self.acs:
             return summary
 
         merge = pd.merge(summary, self.acs.summary, on='county_fips')
         return merge
 
-    def add_differences(self,pivot):
+    def add_differences(self, pivot):
         if not self.acs:
             return
 

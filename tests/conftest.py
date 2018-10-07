@@ -10,12 +10,14 @@ def stops():
     stops.create_summary()
     return stops
 
+
 @pytest.fixture
 def acsStops():
     acs = AcsData('data/acs_test.csv')
     stops = Stop(stop_filepath='data/stops_test.csv', acs=acs)
     stops.create_summary()
     return stops
+
 
 @pytest.fixture
 def chunkedStops():
