@@ -36,7 +36,7 @@ class Stop:
         self.df = df
         return True
 
-    def create_summary(self):
+    def create_summary(self,output_directory='data/summaries'):
         if self.chunk is None:
             self.load_dataframe()
         else:
@@ -45,7 +45,8 @@ class Stop:
         self.summary = self.create_summary_internals()
 
         export_filename = self.filepath.split('/')[-1]
-        self.summary.to_csv('data/summaries/' + export_filename)
+        export_path = output_directory + '/' + export_filename
+        self.summary.to_csv(export_path)
 
         return True
 
