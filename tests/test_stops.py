@@ -63,3 +63,7 @@ def test_summary_works_when_chunking():
     assert summary.loc['56001']['white_difference'] < 0.07740
 
 
+def test_drop_rows_with_no_driver_race_data():
+    stops = Stop(stop_filepath="data/stops_test_no_driver_race.csv")
+
+    assert len(stops.df) == 0

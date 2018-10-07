@@ -30,8 +30,10 @@ class Stop:
 
         df = df[df['county_fips'].notna()]
         df = df[df['driver_race'].notna()]
-        df['driver_race'] = df['driver_race'].str.lower()
-        df['county_fips'] = df['county_fips'].astype(int).astype(str)
+        if(len(df) > 0):
+            df['driver_race'] = df['driver_race'].str.lower()
+            df['county_fips'] = df['county_fips'].astype(int).astype(str)
+
         cols_to_drop = ['location_raw', 'county_name', 'driver_race_raw']
 
         if 'officer_id' in df.columns:

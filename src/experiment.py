@@ -7,5 +7,7 @@ from src.stop import Stop
 
 acs = AcsData()
 file = "data/stop_data/IA-clean.csv"
-chunksize = 10 ** 5
-stops = Stop(stop_filepath=file,chunk=True,acs=acs,chunksize=chunksize)
+chunksize = 10 ** 3
+stops = Stop(stop_filepath=file,chunk=True,
+             acs=acs,
+             chunksize=chunksize)
