@@ -11,16 +11,8 @@ class Stop:
         self.filepath = stop_filepath
         self.chunk = chunk
         self.chunksize = chunksize
-        if self.chunk is None:
-            self.load_dataframe()
-            self.summary = self.create_summary()
-        else:
-            self.summary = self.create_chunked_summary()
-            self.summary = self.create_summary()
-        self.add_acs_data_to_summary()
-        self.add_differences()
-        export_filename = self.filepath.split('/')[-1]
-        self.summary.to_csv('data/summaries/' + export_filename)
+        self.summary = None
+
 
     def load_dataframe(self):
         if self.chunk is None:
@@ -37,7 +29,8 @@ class Stop:
         cols_to_drop = ['location_raw', 'county_name', 'driver_race_raw']
 
         if 'officer_id' in df.columns:
-            df['state_officer_id'] = df['state'].str.lower() + df['officer_id'].astype(int).astype(str)
+            officer_id = df['officer_id'].astype(str)
+            df['state_officer_id'] = df['state'].str.lower() + officer_id
             cols_to_drop.append('officer_id')
 
         df = df.drop(cols_to_drop, axis=1)
@@ -46,12 +39,27 @@ class Stop:
 
     def create_summary(self):
         if self.chunk is None:
+            self.load_dataframe()
+        else:
+            self.summary = self.create_chunked_summary()
+
+        self.summary = self.create_summary()
+        
+        return True
+
+    def create_summary_internals(self):
+        if self.chunk is None:
             summary = self.add_stop_percentage_to_summary_table()
         else:
             summary = self.summary
         stop_percentage_label = 'stop_percentage'
         summary[stop_percentage_label] = summary['stops'] / summary['stops'].groupby(level=0).sum()
         pivot = self.create_single_columns_from_summary_table(summary)
+
+        self.add_acs_data_to_summary()
+        self.add_differences()
+        export_filename = self.filepath.split('/')[-1]
+        self.summary.to_csv('data/summaries/' + export_filename)
         return pivot
 
     def create_single_columns_from_summary_table(self, summary):
