@@ -61,3 +61,5 @@ def test_summary_works_when_chunking():
     summary = stops.summary
     assert summary.loc['56001']['white_difference'] > 0.07730
     assert summary.loc['56001']['white_difference'] < 0.07740
+
+

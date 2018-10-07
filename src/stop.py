@@ -11,8 +11,8 @@ class Stop:
         self.filepath = stop_filepath
         self.chunk = chunk
         self.chunksize = chunksize
-        self.load_dataframe()
         if self.chunk is None:
+            self.load_dataframe()
             self.summary = self.create_summary()
         else:
             self.summary = self.create_chunked_summary()
@@ -22,11 +22,11 @@ class Stop:
         export_filename = self.filepath.split('/')[-1]
         self.summary.to_csv('data/summaries/' + export_filename)
 
-    def load_dataframe(self,chunk=None):
-        if chunk is None:
+    def load_dataframe(self):
+        if self.chunk is None:
             df = pd.read_csv(self.filepath)
         else:
-            df = chunk
+            df = self.chunk
 
         df = df[df['county_fips'].notna()]
         df = df[df['driver_race'].notna()]
@@ -94,7 +94,8 @@ class Stop:
         for chunk in pd.read_csv(self.filepath, chunksize=self.chunksize):
             now = datetime.datetime.now()
             print(self.filepath + " - " + str(self.chunksize * counter) + " - " + now.strftime("%H:%M:%S"))
-            self.load_dataframe(chunk=chunk)
+            self.chunk = chunk
+            self.load_dataframe()
             summary = self.add_stop_percentage_to_summary_table()
             total_summary = pd.concat([total_summary, summary])
             counter = counter + 1
