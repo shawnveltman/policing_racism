@@ -1,6 +1,3 @@
-import pandas as pd
-
-from src.acsdata import AcsData
 from src.stop import Stop
 
 
