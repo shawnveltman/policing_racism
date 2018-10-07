@@ -15,7 +15,7 @@ class Stop:
 
     def load_dataframe(self):
         if self.chunk is None:
-            df = pd.read_csv(self.filepath)
+            df = pd.read_csv(self.filepath,dtype={'county_fips':str})
         else:
             df = self.chunk
 
@@ -23,7 +23,6 @@ class Stop:
         df = df[df['driver_race'].notna()]
         if (len(df) > 0):
             df['driver_race'] = df['driver_race'].str.lower()
-            df['county_fips'] = df['county_fips'].astype(int).astype(str)
 
         cols_to_drop = ['location_raw', 'county_name', 'driver_race_raw']
 
@@ -106,7 +105,7 @@ class Stop:
     def create_chunked_summary(self):
         total_summary = pd.DataFrame()
         counter = 1
-        for chunk in pd.read_csv(self.filepath, chunksize=self.chunksize):
+        for chunk in pd.read_csv(self.filepath, chunksize=self.chunksize, dtype={'county_fips':str}):
             now = datetime.datetime.now()
             print(self.filepath + " - " + str(self.chunksize * counter) + " - " + now.strftime("%H:%M:%S"))
             self.chunk = chunk

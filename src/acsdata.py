@@ -26,7 +26,7 @@ class AcsData:
         return summary
 
     def rename_columns(self):
-        fips = self.df['GEO.id2'].astype('str').str[:5]
+        fips = self.get_fips()
 
         hispanic_values = ['HD01_VD13', 'HD01_VD14', 'HD01_VD15', 'HD01_VD16', 'HD01_VD17', 'HD01_VD18',
                            'HD01_VD19', 'HD01_VD20', 'HD01_VD21']
@@ -57,7 +57,10 @@ class AcsData:
         df.rename(columns=col_names, inplace=True)
         self.df = df
 
+    def get_fips(self):
+        return self.df['GEO.id'].str[9:].str[:5]
+
     def load_data(self):
-        community_data = pd.read_csv(self.filepath, encoding="ISO-8859-1")
+        community_data = pd.read_csv(self.filepath, encoding="ISO-8859-1",dtype={'GEO.id':str,'GEO.id2':str})
         data = community_data[1:]
         return data
