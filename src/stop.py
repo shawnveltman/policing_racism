@@ -12,9 +12,15 @@ class Stop:
         self.chunk = chunk
         self.chunksize = chunksize
         self.load_dataframe()
-        self.summary = self.create_summary()
+        if self.chunk is None:
+            self.summary = self.create_summary()
+        else:
+            self.summary = self.create_chunked_summary()
+            self.summary = self.create_summary()
         self.add_acs_data_to_summary()
         self.add_differences()
+        export_filename = self.filepath.split('/')[-1]
+        self.summary.to_csv('data/summaries/' + export_filename)
 
     def load_dataframe(self,chunk=None):
         if chunk is None:
@@ -37,7 +43,10 @@ class Stop:
         self.df = df
 
     def create_summary(self):
-        summary = self.add_stop_percentage_to_summary_table()
+        if self.chunk is None:
+            summary = self.add_stop_percentage_to_summary_table()
+        else:
+            summary = self.summary
         stop_percentage_label = 'stop_percentage'
         summary[stop_percentage_label] = summary['stops'] / summary['stops'].groupby(level=0).sum()
         pivot = self.create_single_columns_from_summary_table(summary)
@@ -52,7 +61,6 @@ class Stop:
         return pivot
 
     def add_stop_percentage_to_summary_table(self):
-
         summary = self.df.groupby(['county_fips', 'driver_race']).agg('count')
         summary = summary[['id']]
         summary['stops'] = summary['id']
@@ -85,12 +93,12 @@ class Stop:
         counter = 1
         for chunk in pd.read_csv(self.filepath, chunksize=self.chunksize):
             now = datetime.datetime.now()
+            print(self.filepath + " - " + str(self.chunksize * counter) + " - " + now.strftime("%H:%M:%S"))
             self.load_dataframe(chunk=chunk)
             summary = self.add_stop_percentage_to_summary_table()
             total_summary = pd.concat([total_summary, summary])
             counter = counter + 1
 
         group = total_summary.reset_index()
-        group.drop('stop_percentage', inplace=True, axis=1)
         group = group.groupby(['county_fips', 'driver_race']).agg('sum')
         return group
