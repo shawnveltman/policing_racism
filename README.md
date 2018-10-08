@@ -1,4 +1,4 @@
-# policing_racism
+# Racism in Traffic Stops
 Tools to analyze racism in police stops across the US
 
 This project merges the police stop data from https://openpolicing.stanford.edu/data/ with the American Community Survey 
