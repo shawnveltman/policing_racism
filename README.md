@@ -19,7 +19,7 @@ from src.reporting import ReportManager
 
 acs = AcsData()
 reporting = ReportManager()
-reporting.run_reports()
+reporting.run_reports(acs=acs)
 reporting.consolidate_reports()
 reporting.update_base_stop_report(acs=acs)
 ```
