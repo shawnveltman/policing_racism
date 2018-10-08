@@ -1,12 +1,10 @@
+import time
+
+from src.acsdata import AcsData
 from src.reporting import ReportManager
 
-output_directory = "data/summaries"
-input_directory = 'data/stop_data'
+acs = AcsData()
 
-# acs = AcsData()
-reporter = ReportManager()
-# reporter.run_reports(input_directory=input_directory,
-#                      output_directory=output_directory,
-#                      acs=acs)
-
-reporter.consolidate_reports(directory='data/summaries')
+reporting = ReportManager()
+reporting.consolidate_reports('data/summaries')
+reporting.update_base_stop_report('data/summaries/master_report.csv',acs=acs)
