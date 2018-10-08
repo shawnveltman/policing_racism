@@ -27,7 +27,7 @@ class AcsData:
 
     def rename_columns(self):
         fips = self.get_fips()
-
+        locations = self.df['GEO.display-label']
         hispanic_values = ['HD01_VD13', 'HD01_VD14', 'HD01_VD15', 'HD01_VD16', 'HD01_VD17', 'HD01_VD18',
                            'HD01_VD19', 'HD01_VD20', 'HD01_VD21']
 
@@ -53,7 +53,7 @@ class AcsData:
             'hispanic': 'hispanic',
             'other': 'other'
         }
-
+        df['location_text'] = locations
         df.rename(columns=col_names, inplace=True)
         self.df = df
 
