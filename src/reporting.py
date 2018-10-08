@@ -12,7 +12,7 @@ class ReportManager:
         self.skipped_files = []
         self.acs = None
 
-    def consolidate_reports(self, directory,extension='.csv',report_name="/master_report.csv"):
+    def consolidate_reports(self, directory='data/summaries',extension='.csv',report_name="/master_report.csv"):
         files = glob.glob(directory + "/*" + extension)
         master_filename = directory + report_name
 
@@ -28,7 +28,7 @@ class ReportManager:
 
         master_report.to_csv(master_filename)
 
-    def run_reports(self, output_directory, input_directory,extension='.csv',acs=None,skip=[]):
+    def run_reports(self, output_directory='data/summaries', input_directory='data/stop_data',extension='.csv',acs=None,skip=[]):
         files = glob.glob(input_directory + "/*" + extension)
         for file in files:
             if file in skip:
@@ -44,7 +44,7 @@ class ReportManager:
 
         return True
 
-    def update_base_stop_report(self, filepath,acs):
+    def update_base_stop_report(self, acs,filepath='data/summaries/master_report.csv'):
         df = pd.read_csv(filepath,index_col='county_fips',dtype={'county_fips':str})
         df.fillna(0,inplace=True)
         df = self.set_total_stops(acs, df)
@@ -77,7 +77,6 @@ class ReportManager:
         row_county_fips_ = row.loc['county_fips'].astype(int).astype(str)
         while len(row_county_fips_) < 5:
             row_county_fips_ = '0' + row_county_fips_
-        print(row_county_fips_)
         text_rows = self.acs[self.acs['county_fips'] == row_county_fips_]
         if len(text_rows) > 0:
             text = text_rows.iloc[0]['location_text']

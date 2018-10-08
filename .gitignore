@@ -1,5 +1,5 @@
 .idea/
 .ipynb_checkpoints/
 *__pycache__*
-src/data
+src/data/stop_data/*.csv
 *cache*
