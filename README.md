@@ -28,3 +28,4 @@ Future work should be done to:
 1. Break out bias by officer_id (where provied)
 2. Get police district shapefiles so we can break down racial makeups by the overlap of those districts, instead of just the county FIPS (the ACS survey gives us info on delightfully granular areas, whereas FIPS is much larger by comparison)
 3. Refactor to allow for many different report types to be run - IE breakdown by result of stop, etc
+4. Clean out all the vestigal ipynb files
