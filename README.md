@@ -10,7 +10,7 @@ A short writeup of initial findings can be found [here](https://docs.google.com/
 
 Stops are coded by FIPS (https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards).
 
-To begin, you'll need to download the data from the Stanford Open Policing site, and place the CSVs into into the src/data/stop_data folder.
+To begin, you'll need to download the data from the Stanford Open Policing site, and place the CSVs into into the src/data/stop_data folder.  By default, the report file will be called "master_report.csv" and it will live in the data/summaries directory.  
 
 Example code to run reports on all files in your data/stop_data directory:
 ```
