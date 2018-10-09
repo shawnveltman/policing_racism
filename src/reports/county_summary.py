@@ -4,22 +4,25 @@ import pandas as pd
 
 
 class CountySummary:
-    def __init__(self,stop):
+    def __init__(self,stop,output_directory='data/summaries'):
+        self.output_directory = output_directory
         self.stop = stop
+        self.summary = None
 
-    def create_summary(self,output_directory='data/summaries'):
+    def create_summary(self):
         if self.stop.chunk is None:
             self.stop.load_dataframe()
         else:
-            self.stop.summary = self.create_chunked_summary()
+            chunked_summary = self.create_chunked_summary()
+            self.summary = chunked_summary
 
-        self.stop.summary = self.create_summary_internals()
+        self.summary = self.create_summary_internals()
 
         export_filename = self.stop.filepath.split('/')[-1]
-        export_path = output_directory + '/' + export_filename
-        self.stop.summary.to_csv(export_path)
+        export_path = self.output_directory + '/' + export_filename
+        self.summary.to_csv(export_path)
 
-        return self.stop.summary
+        return self.summary
 
     def create_chunked_summary(self):
         total_summary = pd.DataFrame()
@@ -42,7 +45,7 @@ class CountySummary:
         if self.stop.chunk is None:
             summary = self.add_stop_percentage_to_summary_table()
         else:
-            summary = self.stop.summary
+            summary = self.summary
 
         stop_percentage_label = 'stop_percentage'
         summary[stop_percentage_label] = summary['stops'] / summary['stops'].groupby(level=0).sum()

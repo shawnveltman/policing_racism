@@ -8,7 +8,6 @@ from src.reports.county_summary import CountySummary
 class Stop:
     def __init__(self, stop_filepath=None, acs=None, chunk=None, chunksize=1000000):
         self.df = None
-        self.chunked_summary = None
         self.acs = acs
         self.filepath = stop_filepath
         self.chunk = chunk
