@@ -1,10 +1,9 @@
-import datetime
 import glob
 import os
 
 import pandas as pd
 
-from src.reports.county_summary import CountySummary
+from src.reports.generalsummary import GeneralSummary
 from src.stop import Stop
 
 
@@ -42,7 +41,7 @@ class ReportManager:
                 self.skipped_files.append(file_path)
             else:
                 stops = Stop(file,acs=acs,chunk=True)
-                countySummary = CountySummary(stops)
+                countySummary = GeneralSummary(stops)
                 countySummary.create_summary()
 
         return True

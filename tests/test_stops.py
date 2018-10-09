@@ -1,4 +1,5 @@
 from src.reports.county_summary import CountySummary
+from src.reports.generalsummary import GeneralSummary
 from src.stop import Stop
 
 
@@ -32,7 +33,7 @@ def test_when_acs_given_summary_contains_acs(acsStops):
 
 def test_files_with_no_officer_id_loads():
     stops = Stop(stop_filepath="data/stops_test_no_officer_id.csv")
-    countySummary = CountySummary(stops)
+    countySummary = GeneralSummary(stops)
     countySummary.create_summary()
 
     assert len(countySummary.stop.df) > 5
@@ -46,7 +47,7 @@ def test_summary_works_when_chunking(chunkedStops):
 
 def test_drop_rows_with_no_driver_race_data():
     stops = Stop(stop_filepath="data/stops_test_no_driver_race.csv")
-    countySummary = CountySummary(stops)
+    countySummary = GeneralSummary(stops)
     countySummary.create_summary()
 
     assert len(countySummary.stop.df) == 0

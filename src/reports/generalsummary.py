@@ -4,6 +4,13 @@ from abc import abstractmethod
 import pandas as pd
 
 class GeneralSummary:
+    @classmethod
+    def __init__(self, stop, output_directory='data/summaries', groupby_columns=['county_fips', 'driver_race']):
+        self.groupby_columns = groupby_columns
+        self.summary = None
+        self.output_directory = output_directory
+        self.stop = stop
+
     def create_chunked_summary(self, stop):
         total_summary = pd.DataFrame()
         counter = 1
@@ -72,3 +79,10 @@ class GeneralSummary:
         merge = pd.merge(summary, self.stop.acs.summary, on='county_fips')
         return merge
 
+    def create_single_columns_from_summary_table(self, summary):
+        summary = summary.reset_index()
+        melt = summary.melt(id_vars=self.groupby_columns, value_vars=['stops', 'stop_percentage'])
+        pivot = melt.pivot_table(index=['county_fips'], columns=['driver_race', 'variable'], values='value')
+        pivot.columns = ['_'.join(col).strip() for col in pivot.columns.values]
+        pivot.columns = pivot.columns.get_level_values(0)
+        return pivot

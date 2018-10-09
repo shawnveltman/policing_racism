@@ -38,7 +38,7 @@ class Stop:
         return True
 
     def create_county_summary(self, output_directory='data/summaries'):
-        county_summary = CountySummary(self)
+        county_summary = GeneralSummary(self)
         self.summary = county_summary.create_summary(output_directory=output_directory)
 
         return True

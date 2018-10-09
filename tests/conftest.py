@@ -2,6 +2,7 @@ import pytest
 
 from src.acsdata import AcsData
 from src.reports.county_summary import CountySummary
+from src.reports.generalsummary import GeneralSummary
 from src.stop import Stop
 
 @pytest.fixture
@@ -13,7 +14,7 @@ def acs():
 @pytest.fixture
 def stops():
     stops = Stop(stop_filepath='data/stops_test.csv')
-    countySummary = CountySummary(stops)
+    countySummary = GeneralSummary(stops)
     countySummary.create_summary()
 
     return countySummary
@@ -23,7 +24,7 @@ def stops():
 def acsStops(acs):
     stops = Stop(stop_filepath='data/stops_test.csv', acs=acs)
 
-    countySummary = CountySummary(stops)
+    countySummary = GeneralSummary(stops)
     countySummary.create_summary()
 
     return countySummary
@@ -32,7 +33,7 @@ def acsStops(acs):
 @pytest.fixture
 def chunkedStops(acs):
     stops = Stop(stop_filepath="data/stops_test_no_officer_id.csv", chunk=True, acs=acs, chunksize=10)
-    countySummary = CountySummary(stops)
+    countySummary = GeneralSummary(stops)
     countySummary.create_summary()
 
     return countySummary
