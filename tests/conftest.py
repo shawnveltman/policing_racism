@@ -12,19 +12,19 @@ def acs():
 @pytest.fixture
 def stops():
     stops = Stop(stop_filepath='data/stops_test.csv')
-    stops.create_summary()
+    stops.create_county_summary()
     return stops
 
 
 @pytest.fixture
 def acsStops(acs):
     stops = Stop(stop_filepath='data/stops_test.csv', acs=acs)
-    stops.create_summary()
+    stops.create_county_summary()
     return stops
 
 
 @pytest.fixture
 def chunkedStops(acs):
     stops = Stop(stop_filepath="data/stops_test_no_officer_id.csv", chunk=True, acs=acs, chunksize=10)
-    stops.create_summary()
+    stops.create_county_summary()
     return stops

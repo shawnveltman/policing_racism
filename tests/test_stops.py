@@ -31,7 +31,7 @@ def test_when_acs_given_summary_contains_acs(acsStops):
 
 def test_files_with_no_officer_id_loads():
     stops = Stop(stop_filepath="data/stops_test_no_officer_id.csv")
-    stops.create_summary()
+    stops.create_county_summary()
 
     assert len(stops.df) > 5
 
@@ -44,6 +44,6 @@ def test_summary_works_when_chunking(chunkedStops):
 
 def test_drop_rows_with_no_driver_race_data():
     stops = Stop(stop_filepath="data/stops_test_no_driver_race.csv")
-    stops.create_summary()
+    stops.create_county_summary()
 
     assert len(stops.df) == 0
