@@ -1,4 +1,4 @@
-county_fips,asian,asian_percentage,asian_stop_percentage,asian_stops,black,black_percentage,black_stop_percentage,black_stops,hispanic,hispanic_percentage,hispanic_stop_percentage,hispanic_stops,other,other_percentage,total_population,white,white_percentage,white_stop_percentage,white_stops
-56001,,,0.02,2.0,,,0.04,4.0,,,0.03,3.0,,,,,,0.91,91.0
-56003,,,,,,,,,,,,,,,,,,1.0,1.0
-56001,1139.0,0.030103605032244424,0.02,2.0,509.0,0.013452796278676392,0.04,4.0,3677.0,0.09718257743947564,0.03,3.0,316.0,0.008351834231948409,37836.0,31506.0,0.8326990168093878,0.91,91.0
+county_fips,asian_stop_percentage,asian_stops,black_stop_percentage,black_stops,hispanic_stop_percentage,hispanic_stops,white_stop_percentage,white_stops,total_population,white,black,asian,hispanic,other,white_percentage,black_percentage,hispanic_percentage,asian_percentage,other_percentage
+56001,0.02,2.0,0.04,4.0,0.03,3.0,0.91,91.0,37836,31506,509,1139,3677,316,0.8326990168093878,0.013452796278676392,0.09718257743947564,0.030103605032244424,0.008351834231948409
+56003,,,,,,,1.0,1.0,11931,10492,28,64,1084,143,0.8793898248260833,0.00234682759198726,0.09085575391836392,0.0053641773531137365,0.011985583773363506
+56001,0.02,2.0,0.04,4.0,0.03,3.0,0.91,91.0,37836,31506,509,1139,3677,316,0.8326990168093878,0.013452796278676392,0.09718257743947564,0.030103605032244424,0.008351834231948409
