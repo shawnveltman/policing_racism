@@ -62,7 +62,7 @@ class GeneralSummary:
         pivot = self.create_single_columns_from_summary_table(summary)
 
         pivot = self.add_acs_data_to_summary(pivot)
-        # pivot = self.add_differences(pivot)
+
         if pivot is None:
             return summary
 

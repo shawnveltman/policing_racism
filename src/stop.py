@@ -1,8 +1,4 @@
-import datetime
-
 import pandas as pd
-
-from src.reports.county_summary import CountySummary
 
 
 class Stop:
@@ -16,7 +12,7 @@ class Stop:
 
     def load_dataframe(self):
         if self.chunk is None:
-            df = pd.read_csv(self.filepath,dtype={'county_fips':str})
+            df = pd.read_csv(self.filepath, dtype={'county_fips': str})
         else:
             df = self.chunk
 
@@ -27,6 +23,8 @@ class Stop:
 
         cols_to_drop = ['location_raw', 'county_name', 'driver_race_raw']
 
+        df['state_officer_id'] = ''
+
         if 'officer_id' in df.columns:
             officer_id = df['officer_id'].astype(str)
             df['state_officer_id'] = df['state'].str.lower() + officer_id
@@ -36,13 +34,3 @@ class Stop:
 
         self.df = df
         return True
-
-    def create_county_summary(self, output_directory='data/summaries'):
-        county_summary = GeneralSummary(self)
-        self.summary = county_summary.create_summary(output_directory=output_directory)
-
-        return True
-
-
-
-

@@ -32,7 +32,7 @@ def test_skips_files_that_already_have_reports(acs):
 
     # that source file is not analyzed
     reporter = ReportManager()
-    reporter.run_reports(input_directory='data', output_directory='data/summaries',acs=acs,skip=['data/acs_test.csv'])
+    reporter.run_stop_county_reports(input_directory='data', output_directory='data/summaries', acs=acs, skip=['data/acs_test.csv'])
 
     assert filepath in reporter.skipped_files
 
@@ -47,6 +47,6 @@ def test_runs_files_that_do_not_have_reports(acs):
     assert os.path.exists(filepath) is False
 
     reporter = ReportManager()
-    reporter.run_reports(input_directory='data', output_directory='data/summaries',acs=acs,skip=['data/acs_test.csv'])
+    reporter.run_stop_county_reports(input_directory='data', output_directory='data/summaries', acs=acs, skip=['data/acs_test.csv'])
 
     assert os.path.exists(filepath) is True
