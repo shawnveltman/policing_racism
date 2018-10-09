@@ -1,6 +1,6 @@
-import datetime
-
 import pandas as pd
+
+from src.reports.generalsummary import GeneralSummary
 
 
 class CountySummary:
@@ -13,7 +13,8 @@ class CountySummary:
         if self.stop.chunk is None:
             self.stop.load_dataframe()
         else:
-            chunked_summary = self.create_chunked_summary()
+            generalsummary = GeneralSummary()
+            chunked_summary = generalsummary.create_chunked_summary(self.stop)
             self.summary = chunked_summary
 
         self.summary = self.create_summary_internals()
@@ -24,26 +25,10 @@ class CountySummary:
 
         return self.summary
 
-    def create_chunked_summary(self):
-        total_summary = pd.DataFrame()
-        counter = 1
-        filepath = self.stop.filepath
-        for chunk in pd.read_csv(filepath, chunksize=self.stop.chunksize, dtype={'county_fips':str}):
-            now = datetime.datetime.now()
-            print(filepath + " - " + str(self.stop.chunksize * counter) + " - " + now.strftime("%H:%M:%S"))
-            self.stop.chunk = chunk
-            self.stop.load_dataframe()
-            summary = self.add_stop_percentage_to_summary_table()
-            total_summary = pd.concat([total_summary, summary])
-            counter = counter + 1
-
-        group = total_summary.reset_index()
-        group = group.groupby(['county_fips', 'driver_race']).agg('sum')
-        return group
-
     def create_summary_internals(self):
         if self.stop.chunk is None:
-            summary = self.add_stop_percentage_to_summary_table()
+            generalsummary = GeneralSummary()
+            summary = generalsummary.add_stop_percentage_to_summary_table(self.stop)
         else:
             summary = self.summary
 
@@ -65,13 +50,6 @@ class CountySummary:
         pivot.columns = ['_'.join(col).strip() for col in pivot.columns.values]
         pivot.columns = pivot.columns.get_level_values(0)
         return pivot
-
-    def add_stop_percentage_to_summary_table(self):
-        summary = self.stop.df.groupby(['county_fips', 'driver_race']).agg('count')
-        summary = summary[['id']]
-        summary['stops'] = summary['id']
-        summary = summary[['stops']]
-        return summary
 
     def add_acs_data_to_summary(self, summary):
         if not self.stop.acs:
