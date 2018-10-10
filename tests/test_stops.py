@@ -3,30 +3,30 @@ from src.reports.generalsummary import GeneralSummary
 from src.stop import Stop
 
 
-def test_stops_discards_rows_without_race(stops):
-    assert len(stops.stop.df) == 100
+def test_stops_discards_rows_without_race(stops_summary):
+    assert len(stops_summary.stop.df) == 100
 
 
-def test_summary_created_on_loading(acsStops):
-    assert acsStops.summary.loc['56001']['white_stops'] == 91
+def test_summary_created_on_loading(acs_stop_summary):
+    assert acs_stop_summary.summary.loc['56001']['white_stops'] == 91
 
 
-def test_creates_unique_officer_id_from_state_and_officer_id(stops):
-    stops = stops.stop.df
+def test_creates_unique_officer_id_from_state_and_officer_id(stops_summary):
+    stops = stops_summary.stop.df
     stops_by_officer_wy40 = stops[stops['state_officer_id'] == 'wy40']
 
     assert len(stops_by_officer_wy40) > 0
     assert "officer_id" not in stops
 
 
-def test_when_no_acs_given_summary_is_just_pivot(stops):
-    columns = stops.summary.columns
+def test_when_no_acs_given_summary_is_just_pivot(stops_summary):
+    columns = stops_summary.summary.columns
 
     assert "white_percentage" not in columns
 
 
-def test_when_acs_given_summary_contains_acs(acsStops):
-    record = acsStops.summary.loc['56001']['white_percentage']
+def test_when_acs_given_summary_contains_acs(acs_stop_summary):
+    record = acs_stop_summary.summary.loc['56001']['white_percentage']
     assert record > 0.83269
     assert record < 0.83271
 

@@ -12,19 +12,20 @@ def acs():
 
 
 @pytest.fixture
-def stops():
+def stops_summary():
     stops = Stop(stop_filepath='data/stops_test.csv')
     countySummary = GeneralSummary(stops)
     countySummary.create_summary()
 
     return countySummary
 
+@pytest.fixture
+def acs_stops(acs):
+    return Stop(stop_filepath='data/stops_test.csv', acs=acs)
 
 @pytest.fixture
-def acsStops(acs):
-    stops = Stop(stop_filepath='data/stops_test.csv', acs=acs)
-
-    countySummary = GeneralSummary(stops)
+def acs_stop_summary(acs_stops):
+    countySummary = GeneralSummary(acs_stops)
     countySummary.create_summary()
 
     return countySummary
