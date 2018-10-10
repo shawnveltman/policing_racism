@@ -50,3 +50,22 @@ def test_runs_files_that_do_not_have_reports(acs):
     reporter.run_stop_county_reports(input_directory='data', output_directory='data/summaries', acs=acs, skip=['data/acs_test.csv'])
 
     assert os.path.exists(filepath) is True
+
+def test_master_report_has_three_counties(acs):
+    # Delete files in report directory
+    delete_all_files()
+
+    reporter = ReportManager()
+    output_directory = 'data/summaries'
+    reporter.run_stop_county_reports(input_directory='data', output_directory=output_directory, acs=acs,
+                                     skip=['data/acs_test.csv'])
+    reporter.consolidate_reports(output_directory)
+
+    master_report = pd.read_csv(output_directory + '/master_report.csv', index_col='county_fips')
+    assert len(master_report) == 3
+
+def delete_all_files():
+    directory = "data/summaries"
+    for filename in os.listdir(directory):
+        if filename != '.DS_Store':
+            os.unlink(directory + "/" + filename)
