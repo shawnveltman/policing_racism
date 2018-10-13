@@ -1,8 +1,17 @@
-from src.acsdata import AcsData
-from src.reporting import ReportManager
+import pandas as pd
+
+from acsdata import AcsData
+from officerid import OfficerId
+from reporting import ReportManager
 
 acs = AcsData()
-reporting = ReportManager()
-reporting.run_reports()
-reporting.consolidate_reports()
-reporting.update_base_stop_report(acs=acs)
+officer_id_summary_directory = 'data/summaries/officer_id'
+
+reporter = ReportManager()
+output_directory = officer_id_summary_directory
+reporter.run_stop_county_reports(input_directory='data/stop_data', output_directory=output_directory, acs=acs,
+                                 stopmodel=OfficerId)
+reporter.consolidate_reports(output_directory)
+master_report = pd.read_csv(output_directory + '/master_report.csv', dtype={'county_fips': str})
+df = reporter.update_base_stop_report(acs=acs, filepath=officer_id_summary_directory + '/master_report.csv',
+                                      index_col=None)

@@ -2,4 +2,6 @@
 .ipynb_checkpoints/
 *__pycache__*
 src/data/stop_data/*.csv
+src/data/summaries/*.csv
+tests/data/summaries/*.csv
 *cache*
