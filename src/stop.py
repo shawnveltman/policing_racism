@@ -49,11 +49,14 @@ class Stop:
 
         self.summary = self.create_summary_internals()
 
+        self.export_file()
+
+        return self.summary
+
+    def export_file(self):
         export_filename = self.filepath.split('/')[-1]
         export_path = self.output_directory + '/' + export_filename
         self.summary.to_csv(export_path)
-
-        return self.summary
 
     def create_chunked_summary(self):
         total_summary = pd.DataFrame()
@@ -82,8 +85,7 @@ class Stop:
         if self.chunk is None:
             self.summary = self.add_stop_percentage_to_summary_table()
 
-        stop_percentage_label = 'stop_percentage'
-        self.summary[stop_percentage_label] = self.summary['stops'] / self.summary['stops'].groupby(level=0).sum()
+        self.create_stop_percentage()
 
         pivot = self.create_single_columns_from_summary_table()
 
@@ -94,6 +96,9 @@ class Stop:
 
         return pivot
 
+    def create_stop_percentage(self):
+        stop_percentage_label = 'stop_percentage'
+        self.summary[stop_percentage_label] = self.summary['stops'] / self.summary['stops'].groupby(level=0).sum()
 
     def create_single_columns_from_summary_table(self):
         summary = self.summary.reset_index()

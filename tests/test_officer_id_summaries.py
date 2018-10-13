@@ -1,5 +1,7 @@
-from src.stop import Stop
+from src.officerid import OfficerId
 
 
 def test_can_groupby_officer_id(acs):
-    pass
+    stop = OfficerId('data/stop_data/stops_test.csv', acs=acs)
+    stop.create_summary()
+    hello = 'world'
