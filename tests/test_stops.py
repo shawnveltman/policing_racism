@@ -1,4 +1,4 @@
-from src.stop import Stop
+from stop import Stop
 
 
 def test_stops_discards_rows_without_race(stops_summary):

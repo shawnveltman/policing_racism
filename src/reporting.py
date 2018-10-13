@@ -2,7 +2,7 @@ import glob
 import os
 
 import pandas as pd
-from src.stop import Stop
+from stop import Stop
 
 class ReportManager:
     def __init__(self, index_column='county_fips'):
@@ -67,11 +67,17 @@ class ReportManager:
 
         self.acs = acs.df.reset_index()
         df.reset_index(inplace=True)
-        df['location_text'] = df.apply(self.get_location_text, axis=1)
-
+        # merged_df = self.add_location_text(acs, df)
         df.rename(col_names,inplace=True,axis=1)
         df.to_csv(filepath)
         return df
+
+    def add_location_text(self, acs, df):
+        acs_locations = acs.df[['county_fips', 'location_text']]
+        print("Merging with ACS for county locations!")
+        merged_df = pd.merge(df, acs_locations, on='county_fips', how='left')
+        print("Merge Complete!")
+        return merged_df
 
     def remove_subtraction_difference_column(self, acs, df):
         column_names = df.columns

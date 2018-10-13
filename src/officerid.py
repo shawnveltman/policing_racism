@@ -1,4 +1,4 @@
-from src.stop import Stop
+from stop import Stop
 
 
 class OfficerId(Stop):
@@ -16,7 +16,7 @@ class OfficerId(Stop):
 
     def export_file(self):
         export_filename = self.filepath.split('/')[-1]
-        export_path = self.output_directory + '/' + "officer_id_" + export_filename
+        export_path = self.output_directory + '/' + export_filename
         self.summary.to_csv(export_path)
 
     def create_stop_percentage(self):

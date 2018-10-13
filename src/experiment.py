@@ -1,6 +1,8 @@
-from src.acsdata import AcsData
-from src.officerid import OfficerId
-from src.reporting import ReportManager
+import pandas as pd
+
+from acsdata import AcsData
+from officerid import OfficerId
+from reporting import ReportManager
 
 acs = AcsData()
 officer_id_summary_directory = 'data/summaries/officer_id'

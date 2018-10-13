@@ -1,7 +1,7 @@
 import pytest
 
-from src.acsdata import AcsData
-from src.stop import Stop
+from acsdata import AcsData
+from stop import Stop
 
 
 @pytest.fixture

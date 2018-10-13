@@ -1,4 +1,4 @@
-from src.officerid import OfficerId
+from officerid import OfficerId
 
 
 def test_can_groupby_officer_id(acs):

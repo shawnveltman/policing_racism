@@ -2,8 +2,8 @@ import os
 
 import pandas as pd
 
-from src.officerid import OfficerId
-from src.reporting import ReportManager
+from officerid import OfficerId
+from reporting import ReportManager
 
 
 def test_can_consolidate_all_csv_reports_into_master_report():
@@ -84,6 +84,11 @@ def test_officer_id_master_report_has_correct_difference_percentagas(acs):
     black_excess = df[wy272 & fips].iloc[0]['black_stop_proportion_excess']
 
     assert black_excess > 17.583497 and black_excess < 17.583498
+
+def test_clear_reporting_dirs():
+    delete_all_files()
+    officer_id_summary_directory = 'data/summaries/officer_id'
+    delete_all_files(officer_id_summary_directory)
 
 
 def delete_all_files(directory="data/summaries"):
