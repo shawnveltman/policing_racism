@@ -114,3 +114,4 @@ class Stop:
 
         merge = pd.merge(pivot, self.acs.summary, on='county_fips')
         return merge
+

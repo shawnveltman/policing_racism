@@ -90,26 +90,3 @@ class ReportManager:
             df['total_stops'] = df['total_stops'] + df[column_name]
 
         return df
-
-    def run_stop_county_officer_id_reports(self,
-                                           output_directory='data/summaries',
-                                           input_directory='data/stop_data',
-                                           extension='.csv',
-                                           acs=None,
-                                           skip=[]):
-
-        files = glob.glob(input_directory + "/*" + extension)
-        for file in files:
-            if file in skip:
-                continue
-            filename = file.split('/')[-1]
-            file_path = output_directory + "/" + filename
-            if os.path.exists(file_path):
-                print("Skipping " + file)
-                self.skipped_files.append(file_path)
-            else:
-                stops = Stop(file,acs=acs,chunk=True)
-                countySummary = GeneralSummary(stops,groupby_columns=['county_fips', 'driver_race','state_officer_id'])
-                countySummary.create_summary()
-
-        return True
