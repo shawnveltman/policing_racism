@@ -79,7 +79,6 @@ def test_officer_id_master_report_has_correct_difference_percentagas(acs):
     master_report = pd.read_csv(output_directory + '/master_report.csv', dtype={'county_fips': str})
     df = reporter.update_base_stop_report(acs=acs, filepath=officer_id_summary_directory + '/master_report.csv',
                                           index_col=None)
-    print(df.county_fips.dtype)
     wy272 = df['state_officer_id'] == 'wy272'
     fips = df['county_fips'] == '56001'
     black_excess = df[wy272 & fips].iloc[0]['black_stop_proportion_excess']

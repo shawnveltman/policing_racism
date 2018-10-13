@@ -21,5 +21,7 @@ class OfficerId(Stop):
 
     def create_stop_percentage(self):
         stop_percentage_label = 'stop_percentage'
-        self.summary[stop_percentage_label] = self.summary['stops'] / self.summary['stops'].groupby(level=1).sum()
+        stops_ = self.summary['stops']
+        summary_groupby = self.summary.groupby(['state_officer_id', 'county_fips'])
+        self.summary[stop_percentage_label] = stops_ / summary_groupby.transform(sum)['stops']
         return True
