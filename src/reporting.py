@@ -41,8 +41,7 @@ class ReportManager:
                 self.skipped_files.append(file_path)
             else:
                 stops = Stop(file,acs=acs,chunk=True)
-                countySummary = GeneralSummary(stops)
-                countySummary.create_summary()
+                stops.create_summary()
 
         return True
 
