@@ -1,5 +1,3 @@
-from src.reports.county_summary import CountySummary
-from src.reports.generalsummary import GeneralSummary
 from src.stop import Stop
 
 

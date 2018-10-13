@@ -2,8 +2,6 @@ import glob
 import os
 
 import pandas as pd
-
-from src.reports.generalsummary import GeneralSummary
 from src.stop import Stop
 
 

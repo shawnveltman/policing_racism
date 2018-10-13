@@ -4,9 +4,9 @@ import pandas as pd
 
 
 class Stop:
-    def __init__(self, stop_filepath=None, acs=None, chunk=None, chunksize=1000000, groupby_columns=None, output_directory='data/summaries'):
+    def __init__(self, stop_filepath=None, acs=None, chunk=None, chunksize=1000000, groupby_columns=['county_fips', 'driver_race'], output_directory='data/summaries'):
         self.output_directory = output_directory
-        self.set_groupby_columns(groupby_columns)
+        self.groupby_columns = groupby_columns
         self.df = None
         self.acs = acs
         self.filepath = stop_filepath
@@ -14,10 +14,6 @@ class Stop:
         self.chunksize = chunksize
         self.summary = None
 
-    def set_groupby_columns(self, groupby_columns):
-        if groupby_columns is None:
-            groupby_columns = ['county_fips', 'driver_race']
-        self.groupby_columns = groupby_columns
 
     def load_dataframe(self):
         if self.chunk is None:
