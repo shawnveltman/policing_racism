@@ -32,8 +32,7 @@ def test_skips_files_that_already_have_reports(acs):
 
     # that source file is not analyzed
     reporter = ReportManager()
-    reporter.run_stop_county_reports(input_directory='data', output_directory='data/summaries', acs=acs,
-                                     skip=['data/acs_test.csv'])
+    reporter.run_stop_county_reports(input_directory='data/stop_data', output_directory='data/summaries', acs=acs)
 
     assert filepath in reporter.skipped_files
 
@@ -48,8 +47,7 @@ def test_runs_files_that_do_not_have_reports(acs):
     assert os.path.exists(filepath) is False
 
     reporter = ReportManager()
-    reporter.run_stop_county_reports(input_directory='data', output_directory='data/summaries', acs=acs,
-                                     skip=['data/acs_test.csv'])
+    reporter.run_stop_county_reports(input_directory='data/stop_data', output_directory='data/summaries', acs=acs)
 
     assert os.path.exists(filepath) is True
 
@@ -60,8 +58,7 @@ def test_master_report_has_three_counties(acs):
 
     reporter = ReportManager()
     output_directory = 'data/summaries'
-    reporter.run_stop_county_reports(input_directory='data', output_directory=output_directory, acs=acs,
-                                     skip=['data/acs_test.csv'])
+    reporter.run_stop_county_reports(input_directory='data/stop_data', output_directory=output_directory, acs=acs)
     reporter.consolidate_reports(output_directory)
 
     master_report = pd.read_csv(output_directory + '/master_report.csv', dtype={'county_fips': str})
