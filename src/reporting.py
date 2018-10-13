@@ -4,7 +4,6 @@ import os
 import pandas as pd
 from src.stop import Stop
 
-
 class ReportManager:
     def __init__(self, index_column='county_fips'):
         self.index_column = index_column
@@ -27,7 +26,10 @@ class ReportManager:
 
         master_report.to_csv(master_filename)
 
-    def run_stop_county_reports(self, output_directory='data/summaries', input_directory='data/stop_data', extension='.csv', acs=None, skip=[]):
+    def run_stop_county_reports(self, output_directory='data/summaries',
+                                input_directory='data/stop_data',
+                                extension='.csv', acs=None, skip=[], stopmodel=Stop):
+
         files = glob.glob(input_directory + "/*" + extension)
         for file in files:
             if file in skip:
@@ -38,27 +40,25 @@ class ReportManager:
                 print("Skipping " + file)
                 self.skipped_files.append(file_path)
             else:
-                stops = Stop(file,acs=acs,chunk=True)
+                stops = stopmodel(file,acs=acs,chunk=True,output_directory=output_directory)
                 stops.create_summary()
 
         return True
 
-    def update_base_stop_report(self, acs,filepath='data/summaries/master_report.csv'):
-        df = pd.read_csv(filepath,index_col='county_fips',dtype={'county_fips':str})
+    def update_base_stop_report(self, acs,filepath='data/summaries/master_report.csv',index_col='county_fips'):
+        df = pd.read_csv(filepath, index_col=index_col, dtype={'county_fips':str})
         df.fillna(0,inplace=True)
         df = self.set_total_stops(acs, df)
 
+        columns = df.columns
         for race in acs.races:
             name = race + "_stop_proportion_excess"
             stop_percentage = race + "_stop_percentage"
             pop_percentage = race + "_percentage"
-            df[name] = (df[stop_percentage] / df[pop_percentage]) - 1
+            if stop_percentage in columns:
+                df[name] = (df[stop_percentage] / df[pop_percentage]) - 1
 
-        column_names = df.columns
-        for race in acs.races:
-            difference_col = race + "_difference"
-            if difference_col in column_names:
-                df.drop(difference_col,inplace=True,axis=1)
+        df = self.remove_subtraction_difference_column(acs, df)
 
         col_names = {}
         for race in acs.races:
@@ -71,9 +71,19 @@ class ReportManager:
 
         df.rename(col_names,inplace=True,axis=1)
         df.to_csv(filepath)
+        return df
+
+    def remove_subtraction_difference_column(self, acs, df):
+        column_names = df.columns
+        for race in acs.races:
+            difference_col = race + "_difference"
+            if difference_col in column_names:
+                df.drop(difference_col, inplace=True, axis=1)
+        return df
 
     def get_location_text(self, row):
-        row_county_fips_ = row.loc['county_fips'].astype(int).astype(str)
+        fips_ = row['county_fips']
+        row_county_fips_ = str(int(fips_))
         while len(row_county_fips_) < 5:
             row_county_fips_ = '0' + row_county_fips_
         text_rows = self.acs[self.acs['county_fips'] == row_county_fips_]
@@ -85,8 +95,10 @@ class ReportManager:
 
     def set_total_stops(self, acs, df):
         df['total_stops'] = 0
+        columns = df.columns
         for race in acs.races:
             column_name = race + "_stops"
-            df['total_stops'] = df['total_stops'] + df[column_name]
+            if column_name in columns:
+                df['total_stops'] = df['total_stops'] + df[column_name]
 
         return df

@@ -2,6 +2,7 @@ import os
 
 import pandas as pd
 
+from src.officerid import OfficerId
 from src.reporting import ReportManager
 
 
@@ -67,8 +68,28 @@ def test_master_report_has_three_counties(acs):
     assert first_county['white_stop_percentage'][0] == 0.91
 
 
-def delete_all_files():
-    directory = "data/summaries"
-    for filename in os.listdir(directory):
-        if filename != '.DS_Store':
-            os.unlink(directory + "/" + filename)
+def test_officer_id_master_report_has_correct_difference_percentagas(acs):
+    officer_id_summary_directory = 'data/summaries/officer_id'
+    delete_all_files(officer_id_summary_directory)
+    reporter = ReportManager()
+    output_directory = officer_id_summary_directory
+    reporter.run_stop_county_reports(input_directory='data/stop_data', output_directory=output_directory, acs=acs,
+                                     stopmodel=OfficerId)
+    reporter.consolidate_reports(output_directory)
+    master_report = pd.read_csv(output_directory + '/master_report.csv', dtype={'county_fips': str})
+    df = reporter.update_base_stop_report(acs=acs, filepath=officer_id_summary_directory + '/master_report.csv',
+                                          index_col=None)
+    print(df.county_fips.dtype)
+    wy272 = df['state_officer_id'] == 'wy272'
+    fips = df['county_fips'] == '56001'
+    black_excess = df[wy272 & fips].iloc[0]['black_stop_proportion_excess']
+
+    assert black_excess > 17.583497 and black_excess < 17.583498
+
+
+def delete_all_files(directory="data/summaries"):
+    if os.path.isdir(directory):
+        for filename in os.listdir(directory):
+            directory_filename = directory + "/" + filename
+            if filename != '.DS_Store' and os.path.isfile(directory_filename):
+                os.unlink(directory_filename)

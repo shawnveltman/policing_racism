@@ -11,3 +11,4 @@ def test_can_groupby_officer_id(acs):
 
     white_stop_percentage_ = filtered_dataframe['white_stop_percentage']
     assert white_stop_percentage_ == 4 / 6
+
